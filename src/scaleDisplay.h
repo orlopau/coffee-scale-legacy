@@ -10,7 +10,7 @@ class ScaleDisplay
         void setup();
         void info(String line1, String line2 = "");
         void fullsize(String line, bool force = false);
-        void fading(String text, uint ms);
+        void fading(String text, int ms);
         void stopwatch(String weight, String time);
         bool isFading();
     private:

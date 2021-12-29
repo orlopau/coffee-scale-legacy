@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stopwatch.h"
 #include <HX711_ADC.h>
 #include "scaleDisplay.h"
 #include <AceButton.h>
@@ -15,19 +16,28 @@ using namespace ace_button;
 #define PIN_TARE 12
 #define PIN_ONOFF uint8_t(0)
 
+// when this threshold is reached the stopwatch is started
+#define LIN_START_THRESHOLD = 0.5;
+// the timeframe over which the linear regression is run
+#define LIN_WINDOW_TIME = 5000;
+// below this slope the pump is considered stopped
+#define LIN_PUMP_STOP_SLOPE = 0.3
+
 enum Mode
 {
     SCALE,
-    SCALE_STOPWATCH
+    SCALE_STOPWATCH,
+    SCALE_REGRESSION
 };
-const int MODE_SIZE = 2;
-const String MODE_NAMES[MODE_SIZE] = {"Scale", "Timer"};
+const int MODE_SIZE = 3;
+const String MODE_NAMES[MODE_SIZE] = {"Scale", "Timer", "Calc"};
 
-struct StopwatchState
+struct CalcState
 {
-    long lastStartTime;
-    long lastStoppedTime;
-    String lastText;
+    long estimatedTime;
+    float slope;
+    float offset;
+    float measurements[];
 };
 
 class Scale
@@ -41,16 +51,17 @@ public:
     void changeMode(Mode mode);
     void incrementMode();
     void changeSamples();
-    void toggleStopwatch();
     void handleEvent(AceButton *button, uint8_t eventType, uint8_t buttonState);
 
 private:
-    Mode currentMode = SCALE;
     HX711_ADC &loadCell;
     ScaleDisplay &display;
+    Stopwatch stopwatch;
+    Mode currentMode = SCALE;
     String lastWeightString;
-    int currentAveragingMode = 1;
+    int currentAveragingMode = 0;
     // TODO sample sizes greater than 128 dont work at the moment
     const int AVERAGING_MODES[AVERAGING_MODES_SIZE] = {1, 16};
-    StopwatchState stopwatchState = {0, 0};
+    String lastStopwatchText;
+    CalcState calcState = {};
 };

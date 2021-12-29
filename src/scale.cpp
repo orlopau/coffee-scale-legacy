@@ -1,7 +1,7 @@
 #include "scale.h"
 #include <EEPROM.h>
 
-Scale::Scale(HX711_ADC &hx711, ScaleDisplay &display) : loadCell(hx711), display(display)
+Scale::Scale(HX711_ADC &hx711, ScaleDisplay &display) : loadCell(hx711), display(display), stopwatch()
 {
 }
 
@@ -45,8 +45,6 @@ void Scale::update()
         }
     }
 
-    String stopwatchText;
-
     switch (currentMode)
     {
     case SCALE:
@@ -56,18 +54,15 @@ void Scale::update()
         }
         break;
     case SCALE_STOPWATCH:
-        if (stopwatchState.lastStartTime != 0)
-        {
-            stopwatchState.lastStoppedTime = millis() - stopwatchState.lastStartTime;
-        }
-
-        stopwatchText = String((float)stopwatchState.lastStoppedTime / (float)1000, 1) + "s";
-        if (!stopwatchText.equals(stopwatchState.lastText) || changedWeight)
+    {
+        String stopwatchText = String((float)stopwatch.getTime() / (float)1000, 1) + "s";
+        if (!stopwatchText.equals(lastStopwatchText) || changedWeight)
         {
             display.stopwatch(lastWeightString, stopwatchText);
-            stopwatchState.lastText = stopwatchText;
+            lastStopwatchText = stopwatchText;
         }
-        break;
+    }
+    break;
     default:
         display.info("invalid mode", String(currentMode));
         break;
@@ -145,18 +140,6 @@ void Scale::changeSamples()
     display.fading("SS: " + String(samples), 500);
 }
 
-void Scale::toggleStopwatch()
-{
-    if (stopwatchState.lastStartTime == 0)
-    {
-        stopwatchState.lastStartTime = millis();
-    }
-    else
-    {
-        stopwatchState.lastStartTime = 0;
-    }
-}
-
 void Scale::handleEvent(AceButton *button, uint8_t eventType, uint8_t buttonState)
 {
     switch (button->getPin())
@@ -179,7 +162,7 @@ void Scale::handleEvent(AceButton *button, uint8_t eventType, uint8_t buttonStat
             switch (currentMode)
             {
             case SCALE_STOPWATCH:
-                toggleStopwatch();
+                stopwatch.toggle();
                 break;
             }
             break;

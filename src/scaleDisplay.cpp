@@ -45,7 +45,7 @@ void ScaleDisplay::fullsize(String line, bool force)
     display.printFixedN(0, 0, line.c_str(), STYLE_NORMAL, 1);
 }
 
-void ScaleDisplay::fading(String text, uint ms)
+void ScaleDisplay::fading(String text, int ms)
 {
     fadeTimeout = millis() + ms;
     fullsize(text, true);

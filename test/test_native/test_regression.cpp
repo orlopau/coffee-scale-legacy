@@ -100,6 +100,26 @@ void test_size_variable(void)
     TEST_ASSERT_EQUAL_FLOAT(50, result.yIntercept);
 }
 
+void test_x_at_y(void)
+{
+    const regression::Point points[] = {
+        {0, 1},
+        {1, 3},
+    };
+
+    assertSlope(points, 2, 1);
+
+    long x = approximation.getXAtY(7);
+    TEST_ASSERT_EQUAL(3, x);
+}
+
+void test_empty(void)
+{
+    auto result = approximation.getLeastSquares();
+    TEST_ASSERT_FLOAT_IS_NAN(result.m);
+    TEST_ASSERT_FLOAT_IS_NAN(result.yIntercept);    
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -107,5 +127,7 @@ int main(void)
     RUN_TEST(test_not_full);
     RUN_TEST(test_overflow_buffer);
     RUN_TEST(test_size_variable);
+    RUN_TEST(test_x_at_y);
+    RUN_TEST(test_empty);
     return UNITY_END();
 }

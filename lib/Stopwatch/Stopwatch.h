@@ -6,6 +6,7 @@ public:
     void stop();
     void start();
     void toggle();
+    void reset();
     bool isRunning();
     long getTime();
 

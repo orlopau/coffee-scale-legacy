@@ -12,6 +12,7 @@ class ScaleDisplay
         void fullsize(String line, bool force = false);
         void fading(String text, int ms);
         void stopwatch(String weight, String time);
+        void regression(String weight, String time, String regression);
         bool isFading();
     private:
         DisplaySSD1306_128x32_I2C display;

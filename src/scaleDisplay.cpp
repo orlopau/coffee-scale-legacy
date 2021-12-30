@@ -63,3 +63,17 @@ void ScaleDisplay::stopwatch(String weight, String time)
     display.printFixed(0, 18, time.c_str());
     display.printFixedN(0, 0, weight.c_str(), STYLE_NORMAL, 1);
 }
+
+void ScaleDisplay::regression(String weight, String time, String regression)
+{
+    if (isFading())
+    {
+        return;
+    }
+
+    display.clear();
+    display.setFixedFont(ssd1306xled_font6x8);
+    display.printFixed(0, 18, time.c_str());
+    display.printFixed(64, 18, weight.c_str());
+    display.printFixedN(0, 0, regression.c_str(), STYLE_NORMAL, 1);
+}

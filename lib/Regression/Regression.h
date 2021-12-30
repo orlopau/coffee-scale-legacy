@@ -1,4 +1,8 @@
+#pragma once;
+
 #include <CircularBuffer.h>
+#include <math.h>
+#include <climits>
 
 namespace regression
 {
@@ -25,6 +29,8 @@ namespace regression
          * @return approximation
          */
         Result getLeastSquares();
+        long getXAtY(float y);
+        long getXAtY(float y, Result res);
 
     private:
         CircularBuffer<Point, N> buffer;
@@ -67,5 +73,21 @@ namespace regression
             m,
             yIntercept,
         };
+    }
+    
+    template<size_t N>
+    long Approximation<N>::getXAtY(float y) 
+    {
+        return getXAtY(y, getLeastSquares());
+    }
+    
+    template<size_t N>
+    long Approximation<N>::getXAtY(float y, Result res) 
+    {
+        if (isnan(res.m)) {
+            return LONG_MAX;
+        }
+
+        return (y - res.yIntercept) / res.m;
     }
 }

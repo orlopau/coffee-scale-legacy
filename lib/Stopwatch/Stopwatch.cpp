@@ -1,4 +1,4 @@
-#include "stopwatch.h"
+#include "Stopwatch.h"
 #include <Arduino.h>
 
 void Stopwatch::stop()
@@ -22,6 +22,12 @@ void Stopwatch::toggle()
     {
         start();
     }
+}
+
+void Stopwatch::reset() 
+{
+    lastStoppedTime = 0;
+    lastStartTime = 0;
 }
 
 bool Stopwatch::isRunning()

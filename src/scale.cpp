@@ -1,7 +1,8 @@
 #include "scale.h"
 #include <EEPROM.h>
+#include <climits>
 
-Scale::Scale(HX711_ADC &hx711, ScaleDisplay &display) : loadCell(hx711), display(display), stopwatch()
+Scale::Scale(HX711_ADC &hx711, ScaleDisplay &display) : loadCell(hx711), display(display), stopwatch(), approximation()
 {
 }
 
@@ -31,17 +32,27 @@ void Scale::setup()
         ;
 }
 
+static String formatWeight(float weight)
+{
+    return String(weight, 2) + "g";
+}
+
+static String formatTime(long time)
+{
+    return String((float)time / (float)1000, 1) + "s";
+}
+
 void Scale::update()
 {
     bool changedWeight = false;
+    float weight = NAN;
     if (loadCell.update() == 1)
     {
-        float weight = loadCell.getData();
-        String weightString = String(weight, 2) + "g";
-        if (!lastWeightString.equals(weightString))
+        weight = round(loadCell.getData() * 100) / 100;
+        if (lastWeight != weight)
         {
             changedWeight = true;
-            lastWeightString = weightString;
+            lastWeight = weight;
         }
     }
 
@@ -50,19 +61,55 @@ void Scale::update()
     case SCALE:
         if (changedWeight)
         {
-            display.fullsize(lastWeightString);
+            display.fullsize(formatWeight(lastWeight));
         }
         break;
     case SCALE_STOPWATCH:
     {
-        String stopwatchText = String((float)stopwatch.getTime() / (float)1000, 1) + "s";
+        String stopwatchText = formatTime(stopwatch.getTime());
         if (!stopwatchText.equals(lastStopwatchText) || changedWeight)
         {
-            display.stopwatch(lastWeightString, stopwatchText);
+            display.stopwatch(formatWeight(lastWeight), stopwatchText);
             lastStopwatchText = stopwatchText;
         }
+        break;
     }
-    break;
+    case SCALE_REGRESSION:
+    {
+        if (isnan(weight))
+            break;
+
+        // only do something when the stopwatch is running
+        String regressionText = "Waiting";
+        if (stopwatch.isRunning() && weight > LIN_MIN_WEIGHT_THRESHOLD)
+        {
+            approximation.addPoint({stopwatch.getTime(), weight});
+            long targetTime = approximation.getXAtY(targetWeight);
+            long timeLeft = targetTime - stopwatch.getTime();
+            Serial.println("time left: " + String(timeLeft));
+
+            if (weight >= targetWeight || timeLeft < 0)
+            {
+                regressionText = "Done";
+            }
+            else if (timeLeft < LIN_MAX_TIME_TRESHOLD && timeLeft > 0)
+            {
+                Serial.println("target: " + String(targetTime));
+                regressionText = formatTime(-timeLeft);
+            }
+        }
+        else
+        {
+            Serial.println("points reset");
+            approximation.reset();
+        }
+
+        display.regression(
+            formatWeight(lastWeight),
+            formatTime(stopwatch.getTime()),
+            regressionText);
+        break;
+    }
     default:
         display.info("invalid mode", String(currentMode));
         break;
@@ -112,6 +159,9 @@ void Scale::changeMode(Mode mode)
 
 void Scale::incrementMode()
 {
+    stopwatch.reset();
+    approximation.reset();
+
     if (currentMode + 1 == MODE_SIZE)
     {
         changeMode((Mode)0);
@@ -162,6 +212,7 @@ void Scale::handleEvent(AceButton *button, uint8_t eventType, uint8_t buttonStat
             switch (currentMode)
             {
             case SCALE_STOPWATCH:
+            case SCALE_REGRESSION:
                 stopwatch.toggle();
                 break;
             }

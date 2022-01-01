@@ -1,6 +1,5 @@
-#pragma once;
+#pragma once
 
-#define EEPROM_ADDR_CALVAL 0
 #define KNOWN_MASS 100.0
 #define STABILIZING_TIME 2000
 
@@ -18,12 +17,14 @@
 #define LIN_MAX_TIME_TRESHOLD 3 * 60 * 1000
 // the weight above which something is calculated
 #define LIN_MIN_WEIGHT_THRESHOLD 5
+// the maximum weight 
+#define LIN_MAX_SET_WEIGHT 50
 
 enum ScaleButton
 {
-    MODE,
-    ONOFF,
-    TARE,
+    BUTTON_MODE,
+    BUTTON_ONOFF,
+    BUTTON_TARE,
 };
 
 enum ScaleButtonEvent

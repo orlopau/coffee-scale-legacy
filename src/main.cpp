@@ -1,5 +1,9 @@
 #include <Arduino.h>
 #include <WiFiManager.h>
+
+#define WEBSERVER_H
+#include "server.h"
+
 #include <lcdgfx.h>
 #include <HX711_ADC.h>
 #include <EEPROM.h>
@@ -10,6 +14,7 @@ using namespace ace_button;
 #include "scale.h"
 #include "modes.h"
 #include "storage.h"
+#include <ESP8266mDNS.h>
 
 #define PIN_SCL 4
 #define PIN_SDA 5
@@ -41,9 +46,8 @@ AceButton btnOnOff(PIN_ONOFF);
 AceButton btnTare(PIN_TARE);
 
 WiFiManager wifi_manager;
-WiFiManagerParameter param_ip("ip", "IP", "", 40);
-WiFiManagerParameter param_gateway("gateway", "Gateway", "", 40);
-WiFiManagerParameter param_subnet_mask("subnet", "Subnet mask", "255.255.255.0", 40);
+
+CoffeeServer server;
 
 ScaleButton aceToButton(AceButton *button)
 {
@@ -105,36 +109,25 @@ void handleEvent(AceButton *button, uint8_t eventType, uint8_t buttonState)
   modes[currentMode]->handleButton(scale_button, eventType);
 }
 
-void paramsCallback()
-{
-  IPAddress ip;
-  IPAddress gateway;
-  IPAddress subnet_mask;
-
-  Serial.println("saved params");
-
-  bool success = ip.fromString(param_ip.getValue()) && gateway.fromString(param_gateway.getValue()) && subnet_mask.fromString(param_subnet_mask.getValue());
-  if (!success)
-  {
-    Serial.println(String("invalid ip settings: ") + String(param_ip.getValue()) + String(param_gateway.getValue()) + String(param_subnet_mask.getValue()));
-    wifi_manager.resetSettings();
-    wifi_manager.reboot();
-  }
-
-  wifi_manager.setSTAStaticIPConfig(ip, gateway, subnet_mask);
-  storage::updateData();
-  storage::data.network = {ip, gateway, subnet_mask};
-  storage::saveData();
-}
-
 void setup()
 {
   Serial.begin(BAUDRATE);
   EEPROM.begin(512);
+  if (!SPIFFS.begin())
+  {
+    Serial.println("error initializing spiffs");
+    return;
+  }
+
   WiFi.mode(WIFI_STA);
   storage::updateData();
 
   Serial.println("setting up");
+
+  // setup display
+  Serial.println("init display");
+  display.setup();
+  display.info("Coffeescale", "Version 1.0");
 
   // setup buttons
   pinMode(PIN_MODE, INPUT_PULLUP);
@@ -148,15 +141,9 @@ void setup()
   }
 
   // setup wifi
-  auto network = storage::data.network;
-  wifi_manager.setSTAStaticIPConfig(network.ip, network.gateway, network.subnet);
-  wifi_manager.addParameter(&param_ip);
-  wifi_manager.addParameter(&param_gateway);
-  wifi_manager.addParameter(&param_subnet_mask);
   wifi_manager.setConfigPortalBlocking(false);
   wifi_manager.setClass("invert");
   wifi_manager.setDebugOutput(false);
-  wifi_manager.setSaveParamsCallback(paramsCallback);
   if (wifi_manager.autoConnect("Coffee Scale"))
   {
     Serial.println("connected to wifi");
@@ -165,10 +152,6 @@ void setup()
   {
     Serial.println("not connected to wifi, running captive portal");
   }
-
-  // setup display
-  Serial.println("init display");
-  display.setup();
 
   ButtonConfig *buttonConfig = ButtonConfig::getSystemButtonConfig();
   buttonConfig->setEventHandler(handleEvent);
@@ -181,6 +164,15 @@ void setup()
 
   // setup scale
   scale.setup();
+
+  // setup server
+  server.setup();
+
+  // start mdns
+  if (!MDNS.begin("coffee-scale"))
+  {
+    Serial.println("error setting up mdns");
+  }
 }
 
 void loop()
@@ -195,4 +187,5 @@ void loop()
   display.update();
 
   wifi_manager.process();
+  MDNS.update();
 }

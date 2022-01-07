@@ -1,0 +1,18 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "",
+  "source": "index.html",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "scripts": {
+    "start": "parcel serve ./index.html",
+    "build": "parcel build --dist-dir ./build --no-source-maps ./index.html"
+  },
+  "author": "@orlopau",
+  "license": "MIT",
+  "private": "true",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.1",
+    "parcel": "^2.0.1"
+  }
+}

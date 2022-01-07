@@ -8,8 +8,6 @@ Scale::Scale(HX711_ADC &hx711, ScaleDisplay &display) : loadCell(hx711), display
 
 void Scale::setup()
 {
-    display.info("Coffeescale", "Version 1.0");
-
     loadCell.begin();
     loadCell.setSamplesInUse(AVERAGING_MODES[currentAveragingMode]);
 

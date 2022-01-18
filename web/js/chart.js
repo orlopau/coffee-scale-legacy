@@ -63,6 +63,7 @@ let options = {
   },
 }
 
+// eslint-disable-next-line no-undef
 let chart = new ApexCharts(document.querySelector(IDs.diagram), options)
 chart.render()
 

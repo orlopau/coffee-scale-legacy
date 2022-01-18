@@ -46,3 +46,8 @@ long Stopwatch::getTime()
         return lastStoppedTime;
     }
 }
+
+long Stopwatch::getStartTime()
+{
+    return lastStartTime;
+}

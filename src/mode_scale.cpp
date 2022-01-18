@@ -33,3 +33,8 @@ const char *ModeScale::getName()
 {
     return "Scale";
 }
+
+const char *ModeScale::getID()
+{
+    return "scale";
+}

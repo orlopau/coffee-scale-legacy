@@ -46,18 +46,18 @@ void ModeRegression::update(ScaleUpdate update)
         float targetWeight = storage::data.entries[storage::SETTING_REG_TARGET_WEIGHT].value;
         auto result = approximation.getLeastSquares();
         result.yIntercept += storage::data.entries[storage::SETTING_REG_OFFSET].value;
-        long targetTime = approximation.getXAtY(targetWeight, result);
-        long timeLeft = targetTime - stopwatch.getTime();
+        lastEstimatedTime = approximation.getXAtY(targetWeight, result);
+        long timeLeft = lastEstimatedTime - stopwatch.getTime();
         Serial.println("time left: " + String(timeLeft));
 
-        if (update.weight >= targetWeight || timeLeft < 0)
+        if (update.weight >= targetWeight)
         {
             regressionText = "Done";
             stopwatch.stop();
         }
         else if (timeLeft < LIN_MAX_TIME_TRESHOLD && timeLeft > 0)
         {
-            Serial.println("target: " + String(targetTime));
+            Serial.println("target: " + String(lastEstimatedTime));
             regressionText = formatTime(-timeLeft);
         }
     }
@@ -75,4 +75,16 @@ void ModeRegression::update(ScaleUpdate update)
 const char *ModeRegression::getName()
 {
     return "Calc";
+}
+
+const char *ModeRegression::getID()
+{
+    return "regression";
+}
+
+void ModeRegression::createJSONSummary(JsonObject &object)
+{
+    object["targetWeight"] = storage::data.entries[storage::SETTING_REG_TARGET_WEIGHT].value;
+    object["stopwatchStart"] = stopwatch.getStartTime();
+    object["estimatedTime"] = lastEstimatedTime + stopwatch.getStartTime();
 }

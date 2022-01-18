@@ -9,6 +9,7 @@ public:
     void reset();
     bool isRunning();
     long getTime();
+    long getStartTime();
 
 private:
     long lastStartTime = 0;

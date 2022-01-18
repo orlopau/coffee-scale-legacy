@@ -18,5 +18,12 @@
         "memory": "cpp",
         "initializer_list": "cpp",
         "regex": "cpp"
-    }
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "eslint.validate": [
+        "javascript"
+    ],
+    "eslint.format.enable": true
 }

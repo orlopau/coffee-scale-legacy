@@ -44,3 +44,8 @@ const char *ModeStopwatch::getName()
 {
     return "Timer";
 }
+
+const char *ModeStopwatch::getID()
+{
+    return "stopwatch";
+}

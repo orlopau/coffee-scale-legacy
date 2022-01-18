@@ -29,6 +29,7 @@ footer {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.2rem;
+  margin-top: auto;
 }
 
 .button {
@@ -53,6 +54,26 @@ footer {
   }
 }
 
+.text-data {
+  display: flex;
+  flex-direction: column;
+  margin: auto 0;
+
+  .val {
+    font-size: 3.5rem;
+    margin: 0 auto;
+    font-weight: bold;
+  }
+
+  .label {
+    &:first-child {
+      margin-top: 0;
+    }
+    
+    margin: 32px auto 0 auto;
+  }
+}
+
 #title {
   display: flex;
   justify-content: center;
@@ -65,5 +86,7 @@ footer {
 }
 
 #diagram {
-  flex-grow: 1;
+  width: 100%;
+  overflow: hidden;
+  padding-left: 8px;
 }

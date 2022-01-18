@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      @import "./style.scss";
-    </style>
-    <link rel="stylesheet" href="./style.scss" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <title>Coffee Scale</title>
-  </head>
-  <body>
-    <span id="title">Mode</span>
-    <div id="diagram"></div>
-    <footer>
-      <div class="button">Mode</div>
-      <div class="button">On/Off</div>
-      <div class="button">Tare</div>
-    </footer>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script type="module" src="js/chart.js"></script>
+  <link rel="stylesheet" href="./style.scss" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet" />
+  <title>Coffee Scale</title>
+</head>
+
+<body>
+  <span id="title">Mode</span>
+  <div id="diagram"></div>
+  <div class="text-data">
+    <span class="label">Weight</span>
+    <span id="val-weight" class="val"></span>
+    <span class="label">Stopwatch</span>
+    <span id="val-time" class="val"></span>
+    <span class="label">ETA</span>
+    <span id="val-time-est" class="val"></span>
+  </div>
+  <footer>
+    <div class="button">Mode</div>
+    <div class="button">On/Off</div>
+    <div class="button">Tare</div>
+  </footer>
+</body>
+
 </html>

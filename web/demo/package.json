@@ -1,0 +1,16 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mockserver.js",
+  "scripts": {
+    "run": "node mockserver.js"
+  },
+  "author": "porlob",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "CBuffer": "^2.2.0"
+  }
+}

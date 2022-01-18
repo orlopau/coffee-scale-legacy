@@ -37,6 +37,7 @@ ScaleUpdate Scale::update()
     {
         const float weight = round(loadCell.getData() * 100) / 100;
         new_weight = true;
+        history.push({millis(), weight});
         if (lastWeight != weight)
         {
             changed_weight = true;

@@ -47,7 +47,7 @@ AceButton btnTare(PIN_TARE);
 
 WiFiManager wifi_manager;
 
-CoffeeServer server;
+CoffeeServer server(scale);
 
 ScaleButton aceToButton(AceButton *button)
 {
@@ -73,6 +73,7 @@ void changeMode(int mode_index)
   Modes::Mode *mode = modes[currentMode];
   mode->enter();
   display.fading(mode->getName(), 200);
+  server.currentMode = mode;
 }
 
 void incrementMode()
@@ -127,7 +128,7 @@ void setup()
   // setup display
   Serial.println("init display");
   display.setup();
-  display.info("Coffeescale", "Version 1.0");
+  display.info("Hallo Meister", "Coffeescale 1.0");
 
   // setup buttons
   pinMode(PIN_MODE, INPUT_PULLUP);
@@ -166,7 +167,7 @@ void setup()
   scale.setup();
 
   // setup server
-  server.setup();
+  server.setup(modes[currentMode]);
 
   // start mdns
   if (!MDNS.begin("coffee-scale"))
